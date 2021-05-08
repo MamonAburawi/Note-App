@@ -1,0 +1,4 @@
+
+
+//Todo(1) after search on item and click on delete button .. the list will update automatically but the search value is still in edit text search ..
+//Todo(2) after search on item and click on button add note and then back button .. you will see here the filter data in recyclerView is lost but the value inside the edit text search is still..

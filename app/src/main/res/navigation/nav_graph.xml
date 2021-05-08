@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navgraph"
+    app:startDestination="@id/mainScreen">
+    <fragment
+        android:id="@+id/addNote"
+        android:name="com.example.noteapp.screens.add_note.AddNote"
+        android:label="add_note"
+        tools:layout="@layout/add_note" >
+        <action
+            android:id="@+id/action_addNote_to_mainScreen"
+            app:destination="@id/mainScreen" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailScreen"
+        android:name="com.example.noteapp.screens.details.DetailScreen"
+        android:label="deltail_screen"
+        tools:layout="@layout/deltail_screen" />
+    <fragment
+        android:id="@+id/mainScreen"
+        android:name="com.example.noteapp.screens.main.MainScreen"
+        android:label="main_screen"
+        tools:layout="@layout/main_screen" >
+        <action
+            android:id="@+id/action_mainScreen_to_addNote"
+            app:destination="@id/addNote" />
+        <action
+            android:id="@+id/action_mainScreen_to_detailScreen"
+            app:destination="@id/detailScreen" />
+    </fragment>
+</navigation>
