@@ -99,10 +99,10 @@ class MainScreenViewModel(): ViewModel() {
     }
 
 
-   fun sort(f:Sort){
+   fun sort(s:Sort){
        viewModelScope.launch {
-           sort = f
-           when(f){
+           sort = s
+           when(s){
                Sort.Date->{
                    _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed() // sort data from old to new date
                }

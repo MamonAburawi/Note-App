@@ -20,13 +20,7 @@ class NotesAdapter(private val notesList: List<NoteData>,
     class ViewHolder(private val binding: SingleNoteBinding)
         :RecyclerView.ViewHolder(binding.root) {
 
-        fun onBind(
-            holder: ViewHolder,
-            data: NoteData,
-            viewModel: MainScreenViewModel,
-            notesList: List<NoteData>,
-            position: Int
-        ){
+        fun onBind(holder: ViewHolder, data: NoteData, viewModel: MainScreenViewModel){
             holder.binding.TextViewTitle.text = data.title
             holder.binding.TextViewTime.text = setDateFormat(data.noteTime)
 
@@ -47,7 +41,7 @@ class NotesAdapter(private val notesList: List<NoteData>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = notesList[position]
-        holder.onBind(holder,data,viewModel , notesList,position)
+        holder.onBind(holder,data,viewModel)
     }
 
     override fun getItemCount(): Int  = notesList.size

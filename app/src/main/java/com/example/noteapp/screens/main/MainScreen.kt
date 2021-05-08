@@ -29,7 +29,7 @@ class MainScreen : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-         binding = DataBindingUtil.inflate(inflater, R.layout.main_screen,container,false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.main_screen,container,false)
         viewModel = ViewModelProviders.of(this).get(MainScreenViewModel::class.java)
 
 
@@ -49,13 +49,13 @@ class MainScreen : Fragment() {
         // note list
         viewModel.noteList.observe(viewLifecycleOwner, Observer { noteList ->
             listSize = noteList.size
+            binding.recyclerView.adapter = NotesAdapter(noteList,viewModel)
             if (noteList.isEmpty()){
                 binding.recyclerView.visibility = View.GONE
                 binding.TextViewNoData.visibility = View.VISIBLE
             }else{
                 binding.recyclerView.visibility = View.VISIBLE
                 binding.TextViewNoData.visibility = View.GONE
-                binding.recyclerView.adapter = NotesAdapter(noteList,viewModel)
             }
         })
 
