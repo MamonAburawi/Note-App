@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.example.noteapp.screens.details.DetailsViewModel" />
     </data>
 
     <LinearLayout
@@ -43,6 +46,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:textSize="25sp"
+            android:text="@{viewModel.noteData.title}"
             tools:text="Note Title"/>
 
         <TextView
@@ -53,7 +57,8 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             android:textSize="18sp"
-            android:text="this is the note 2021"/>
+            android:text="@{viewModel.noteData.description}"
+            tools:text="this is the note 2021"/>
 
 
 

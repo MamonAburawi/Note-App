@@ -89,7 +89,7 @@ class MainScreenViewModel(): ViewModel() {
                 _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
                 _progressStatus.value = false
                 _onChangeListSize.value = mList.size
-                _results.value = mList.size.toString()
+                _results.value = "Results: ${mList.size}"
             }
         }
     }

@@ -25,6 +25,8 @@ class DetailScreen : Fragment() {
         val noteData =  navArgs<DetailScreenArgs>().value.noteData
         viewModel = ViewModelProvider(this,DetailScreenViewModelFactory(noteData)).get(DetailsViewModel::class.java)
 
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
         viewModel.progress.observe(viewLifecycleOwner, Observer { progress->
             if(progress == true){
@@ -40,8 +42,6 @@ class DetailScreen : Fragment() {
         // noteData
         viewModel.noteData.observe(viewLifecycleOwner, Observer { noteData ->
             if(noteData != null){
-                binding.TextViewTitle.text = noteData.title
-                binding.TextViewDescription.text = noteData.description
                 if (noteData.imageUri.isNotEmpty()){
                     viewModel.loadImage(binding.ImageViewNote,requireActivity())
                 }else{
