@@ -25,7 +25,8 @@ class MainScreenViewModel(): ViewModel() {
     val noteList: LiveData<List<NoteData>> = _noteList
 
     private val _navigateToAddNoteScreen = MutableLiveData<Boolean>()
-    val navigateToDetailScreen: LiveData<Boolean> = _navigateToAddNoteScreen
+    val navigateToAddNoteScreen: LiveData<Boolean> = _navigateToAddNoteScreen
+
 
     private val _progressStatus = MutableLiveData<Boolean>()
     val progressStatus: LiveData<Boolean> = _progressStatus
@@ -39,6 +40,9 @@ class MainScreenViewModel(): ViewModel() {
     private val _results = MutableLiveData<String>()
     val results: LiveData<String> = _results
 
+    private val _navigateToDetailScreen  = MutableLiveData<NoteData>()
+    val navigateToDetailScreen: LiveData<NoteData> = _navigateToDetailScreen
+
     var noteId = ""
     var possition = 0
 
@@ -47,7 +51,7 @@ class MainScreenViewModel(): ViewModel() {
 
     init {
         _navigateToAddNoteScreen.value = false
-        _navigateToAddNoteScreen.value = false
+        _navigateToDetailScreen.value = null
         updateNotesList()
     }
 
@@ -59,6 +63,15 @@ class MainScreenViewModel(): ViewModel() {
         _navigateToAddNoteScreen.value = false
     }
 
+    fun navigateToDetailScreen(data: NoteData){
+        _navigateToDetailScreen.value = data
+    }
+
+    fun navigateToDetailScreenDone(){
+        _navigateToDetailScreen.value = null
+    }
+
+
     fun updateNotesList() {
         _progressStatus.value = true
         viewModelScope.launch {
@@ -69,8 +82,9 @@ class MainScreenViewModel(): ViewModel() {
                     val title = it["title"].toString()
                     val description = it["description"].toString()
                     val imageUri = it["imageUri"].toString()
+                    val imageId = it["imageId"].toString()
                     val noteTime = it["noteTime"] as Timestamp
-                    mList.add(NoteData(id, title, description, imageUri, noteTime))
+                    mList.add(NoteData(id, title, description, imageUri,imageId,noteTime))
                 }
                 _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
                 _progressStatus.value = false

@@ -33,17 +33,34 @@ class MainScreen : Fragment() {
         viewModel = ViewModelProviders.of(this).get(MainScreenViewModel::class.java)
 
 
-        // navigation to detail screen
-        viewModel.navigateToDetailScreen.observe(viewLifecycleOwner, Observer {
+
+        // navigation to add note screen
+        viewModel.navigateToAddNoteScreen.observe(viewLifecycleOwner, Observer {
             if (it == true){
                 findNavController().navigate(R.id.action_mainScreen_to_addNote)
                 viewModel.navigateToAddNoteScreenDone()
             }
         })
 
+        // navigation to detail screen
+        viewModel.navigateToAddNoteScreen.observe(viewLifecycleOwner, Observer {
+            if (it == true){
+                findNavController().navigate(R.id.action_mainScreen_to_detailScreen)
+                viewModel.navigateToDetailScreenDone()
+            }
+        })
+
         // results
         viewModel.results.observe(viewLifecycleOwner, Observer { results->
             binding.TextViewResults.text = "Results: $results"
+        })
+
+        // noteData
+        viewModel.navigateToDetailScreen.observe(viewLifecycleOwner, Observer { noteData->
+            if (noteData != null){
+                findNavController().navigate(MainScreenDirections.actionMainScreenToDetailScreen(noteData))
+                viewModel.navigateToDetailScreenDone()
+            }
         })
 
         // note list

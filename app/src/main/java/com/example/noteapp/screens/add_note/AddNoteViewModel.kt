@@ -1,5 +1,8 @@
 package com.example.noteapp.screens.add_note
 
+import android.net.Uri
+import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,9 +36,19 @@ class AddNoteViewModel(): ViewModel() {
     fun addNote(noteData: NoteData){
         viewModelScope.launch {
             database.addData(noteData)
+                .addOnSuccessListener {  }
+                .addOnFailureListener {
+                    Log.e("send",it.message.toString())
+                }
+            uploadFile(noteData.imageId,noteData.imageUri.toUri())
         }
     }
 
+    private fun uploadFile(imageId:String,imageUri: Uri){
+        viewModelScope.launch {
+            database.uploadFile(imageId,imageUri)
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

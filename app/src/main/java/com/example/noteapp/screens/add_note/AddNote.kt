@@ -1,6 +1,10 @@
 package com.example.noteapp.screens.add_note
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +26,7 @@ class AddNote : Fragment() {
 
     private lateinit var binding: AddNoteBinding
     private lateinit var viewModel: AddNoteViewModel
+    private var uriPath = Uri.EMPTY
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +50,17 @@ class AddNote : Fragment() {
             val title = binding.EditTextNoteTitle.text.trim().toString()
             val description = binding.EditTextNoteDescription.text.trim().toString()
 
-            addNote(uuid, title, description)
+            if(uriPath != null){
+                addNote(uuid, title, description , uriPath)
+            }else{
+                addNote(uuid, title , description , Uri.EMPTY)
+            }
+
+        }
+
+
+        binding.ButtonSelectImage.setOnClickListener{
+            selectImages()
         }
 
 
@@ -53,9 +68,15 @@ class AddNote : Fragment() {
     }
 
 
-    private fun addNote(uuid: String ,title: String , description: String){
+    private fun addNote(uuid: String ,title: String , description: String ,imageUri: Uri){
         if (title.isNotEmpty() && description.isNotEmpty()){
-            val noteData = NoteData(uuid,title,description,"", getCurrentTime())
+            val noteData = NoteData(
+                uuid,
+                title,
+                description,
+                imageUri.toString(),
+                generateUUID(),
+                getCurrentTime())
             viewModel.addNote(noteData)
             viewModel.navigationToMainScreen()
             requireActivity().hideKeyboard(binding.ButtonAdd)
@@ -66,5 +87,21 @@ class AddNote : Fragment() {
     }
 
 
+
+    private fun selectImages(){
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent,"Choose you images"),1)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode  == Activity.RESULT_OK &&  data != null){
+            uriPath = data.data!!
+            val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver,uriPath)
+            binding.ImageViewNote.setImageBitmap(bitmap).toString()
+        }
+    }
 
 }
