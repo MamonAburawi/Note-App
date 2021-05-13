@@ -4,6 +4,7 @@ package com.example.noteapp.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteapp.R
@@ -13,25 +14,20 @@ import com.example.noteapp.databinding.SingleNoteBinding
 import com.example.noteapp.model.NoteData
 import com.example.noteapp.screens.main.MainScreenViewModel
 
-class NotesAdapter(private val notesList: List<NoteData>,
-                   private val viewModel: MainScreenViewModel): ListAdapter<NoteData,NotesAdapter.ViewHolder>(NoteDiffCallback()) {
+class NotesAdapter(): ListAdapter<NoteData,NotesAdapter.ViewHolder>(NoteDiffCallback()) {
+
+    val diff = AsyncListDiffer(this,NoteDiffCallback())
 
 
     class ViewHolder private constructor(private val binding: SingleNoteBinding)
         :RecyclerView.ViewHolder(binding.root) {
-        fun onBind( data: NoteData, viewModel: MainScreenViewModel){
+        fun onBind( data: NoteData){
             binding.TextViewTitle.text = data.title
             binding.TextViewTime.text = setDateFormat(data.noteTime)
 
-            // Button Delete
-            binding.ButtonDeleteNote.setOnClickListener {
-                viewModel.showDeleteDialog(data.id)
-            }
-
             binding.singleItem.setOnClickListener {
-                viewModel.navigateToDetailScreen(data)
-            }
 
+            }
 
         }
 
@@ -51,11 +47,12 @@ class NotesAdapter(private val notesList: List<NoteData>,
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val data = notesList[position]
-        holder.onBind(data,viewModel)
+
+        val data = diff.currentList[position]
+        holder.onBind(data)
     }
 
-    override fun getItemCount(): Int  = notesList.size
+    override fun getItemCount(): Int  = diff.currentList.size
 
 
 

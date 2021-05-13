@@ -1,20 +1,24 @@
 package com.example.noteapp.screens.main
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.example.noteapp.R
 import com.example.noteapp.Utils.Sort
 import com.example.noteapp.adapter.NotesAdapter
 import com.example.noteapp.databinding.MainScreenBinding
+import com.example.noteapp.model.NoteData
+import com.google.android.material.snackbar.Snackbar
 
 
 @Suppress("DEPRECATION")
@@ -22,7 +26,8 @@ class MainScreen : Fragment() {
 
     private lateinit var binding: MainScreenBinding
     private lateinit var viewModel: MainScreenViewModel
-    private var listSize: Int? = 0
+    private val noteAdapter = NotesAdapter()
+    private lateinit var mList: List<NoteData>
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,6 +38,8 @@ class MainScreen : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+
+        swipeToDelete()
 
         // navigation to add note screen
         viewModel.navigateToAddNoteScreen.observe(viewLifecycleOwner, Observer {
@@ -60,8 +67,11 @@ class MainScreen : Fragment() {
 
         // note list
         viewModel.noteList.observe(viewLifecycleOwner, Observer { noteList ->
-            listSize = noteList.size
-            binding.recyclerView.adapter = NotesAdapter(noteList,viewModel)
+            mList = noteList
+            noteAdapter.diff.submitList(noteList)
+            binding.recyclerView.adapter = noteAdapter
+            noteAdapter.notifyDataSetChanged()
+
             if (noteList.isEmpty()){
                 binding.recyclerView.visibility = View.GONE
                 binding.TextViewNoData.visibility = View.VISIBLE
@@ -71,31 +81,6 @@ class MainScreen : Fragment() {
             }
         })
 
-
-        // progress
-        viewModel.progressStatus.observe(viewLifecycleOwner, Observer { status->
-            if(status == true){
-                binding.Progress.visibility = View.VISIBLE
-                binding.recyclerView.visibility = View.GONE
-            }else{
-                binding.Progress.visibility = View.GONE
-                binding.recyclerView.visibility = View.VISIBLE
-            }
-        })
-
-
-
-        /** the list will be updated with any change in size.  **/
-
-        // onChange List Size
-        viewModel.onChangeListSize.observe(viewLifecycleOwner, Observer { size->
-            if (size != listSize){
-                viewModel.updateNotesList()
-                Log.i("size","the size is not the same!")
-            }else{
-                Log.i("size","the size is the same!")
-            }
-        })
 
         // Button add note
         binding.ButtonAddNote.setOnClickListener{
@@ -123,50 +108,42 @@ class MainScreen : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         })
 
-        // delete dialog status
-        viewModel.deleteDialogStatus.observe(viewLifecycleOwner, Observer { status->
-            if (status == true){
-                val builder = AlertDialog.Builder(context).apply {
-                    setTitle("Delete item !")
-                    setMessage("Do you want to delete this item?")
-                    setIcon(R.drawable.ic_delete)
-                    setCancelable(false)
-                    setPositiveButton("yes"){_,_ ->
-                        val id = viewModel.noteId
-                        if (id.isNotEmpty()){
-                            viewModel.deleteNote(id)
-                        }else{
-                            Log.i("dialog","note id is empty !")
-                        }
-                    }
-                    setNegativeButton("No"){_,_ -> }
-                    create()
-                }
-                builder.show()
-                viewModel.hideDeleteDialog()
-            }
-        })
-
-
-
 
         return binding.root
     }
 
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
 
-        }
 
-        return super.onOptionsItemSelected(item)
+    private fun swipeToDelete() {
+        ItemTouchHelper(object : SimpleCallback(
+            UP or DOWN,
+            RIGHT or LEFT
+        ){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: ViewHolder,
+                target: ViewHolder
+            ) = true
+
+            override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+                val newList = mList.toMutableList()
+                val position = viewHolder.adapterPosition
+                val item = noteAdapter.diff.currentList[position]
+                newList.remove(item)
+                viewModel.updateList(item)
+                noteAdapter.notifyItemRemoved(position)
+                viewModel.deleteNote(item)
+
+                Snackbar.make(binding.itemRoot,"Item $position Deleted",Snackbar.LENGTH_LONG).apply {
+                    setAction("Undo"){
+                        // add the note to database
+                    }
+                }.show()
+            }
+
+        }).attachToRecyclerView(binding.recyclerView)
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-
 
 
 }

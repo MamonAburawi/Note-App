@@ -27,24 +27,11 @@ class MainScreenViewModel(): ViewModel() {
     private val _navigateToAddNoteScreen = MutableLiveData<Boolean>()
     val navigateToAddNoteScreen: LiveData<Boolean> = _navigateToAddNoteScreen
 
-
-    private val _progressStatus = MutableLiveData<Boolean>()
-    val progressStatus: LiveData<Boolean> = _progressStatus
-
-    private val _onChangeListSize = MutableLiveData<Int>()
-    val onChangeListSize: LiveData<Int> = _onChangeListSize
-
-    private val _deleteDialogStatus = MutableLiveData<Boolean>()
-    val deleteDialogStatus: LiveData<Boolean> = _deleteDialogStatus
-
     private val _results = MutableLiveData<String>()
     val results: LiveData<String> = _results
 
     private val _navigateToDetailScreen  = MutableLiveData<NoteData>()
     val navigateToDetailScreen: LiveData<NoteData> = _navigateToDetailScreen
-
-    var noteId = ""
-    var possition = 0
 
     private var sort = Sort.Date // by default the sort value will be date
 
@@ -63,17 +50,14 @@ class MainScreenViewModel(): ViewModel() {
         _navigateToAddNoteScreen.value = false
     }
 
-    fun navigateToDetailScreen(data: NoteData){
-        _navigateToDetailScreen.value = data
-    }
-
     fun navigateToDetailScreenDone(){
         _navigateToDetailScreen.value = null
     }
 
 
-    fun updateNotesList() {
-        _progressStatus.value = true
+
+
+   private fun updateNotesList() {
         viewModelScope.launch {
             mList.clear()
             database.getAllNotes().addOnSuccessListener { documents ->
@@ -87,8 +71,6 @@ class MainScreenViewModel(): ViewModel() {
                     mList.add(NoteData(id, title, description, imageUri,imageId,noteTime))
                 }
                 _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
-                _progressStatus.value = false
-                _onChangeListSize.value = mList.size
                 _results.value = "Results: ${mList.size}"
             }
         }
@@ -96,20 +78,16 @@ class MainScreenViewModel(): ViewModel() {
 
 
 
-    fun deleteNote(id: String) {
+    fun deleteNote(item: NoteData) {
         viewModelScope.launch {
-            database.deleteData(id)
-            _onChangeListSize.value = mList.size - 1
+            database.deleteData(item.id)
         }
     }
 
-    fun showDeleteDialog(id: String) {
-        noteId = id
-        _deleteDialogStatus.value = true
-    }
 
-    fun hideDeleteDialog(){
-        _deleteDialogStatus.value = false
+    fun updateList(item: NoteData){
+        mList.remove(item)
+        sort(sort)
     }
 
 
