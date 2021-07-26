@@ -6,9 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.noteapp.Utils.Constants
 import com.example.noteapp.Utils.Sort
+import com.example.noteapp.adapter.NotesAdapter
 import com.example.noteapp.database.DataBase
 import com.example.noteapp.model.NoteData
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
@@ -20,7 +21,6 @@ class MainScreenViewModel(): ViewModel() {
 
     private val viewModelScope = CoroutineScope(Dispatchers.Main + Job())
 
-    private var mList = ArrayList<NoteData>()
 
     private val _noteList = MutableLiveData<List<NoteData>>()
     val noteList: LiveData<List<NoteData>> = _noteList
@@ -78,24 +78,19 @@ class MainScreenViewModel(): ViewModel() {
     }
 
 
-    fun updateList(item: NoteData){
-        mList.remove(item)
-        sort(sort)
+
+
+    fun sortData(sort: String) {
+        viewModelScope.launch {
+            Constants.allNotePath
+                .orderBy(sort)
+                .get().addOnSuccessListener {
+                    val notes = it.toObjects(NoteData::class.java)
+                    _noteList.value = notes
+                }
+        }
     }
 
-
-   fun sort(s:Sort){
-       viewModelScope.launch {
-           sort = s
-           when(s){
-               Sort.Date->{
-                   _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed() // sort data from old to new date
-               }
-               Sort.Name->{
-                   _noteList.value = mList.sortedWith(compareBy{ it.title }) }
-               }
-           }
-       }
 
     fun search(charSequence:String){
         viewModelScope.launch {

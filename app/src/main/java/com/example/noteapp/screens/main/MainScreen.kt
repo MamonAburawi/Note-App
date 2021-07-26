@@ -89,12 +89,12 @@ class MainScreen : Fragment() {
 
         // button filter by date
         binding.ButtonSortByDate.setOnClickListener {
-            viewModel.sort(Sort.Date)
+            viewModel.sortData("noteTime")
         }
 
         // button filter by name
         binding.ButtonSortByName.setOnClickListener {
-            viewModel.sort(Sort.Name)
+            viewModel.sortData("title")
         }
 
         // search edit text
@@ -131,7 +131,6 @@ class MainScreen : Fragment() {
                 val position = viewHolder.adapterPosition
                 val item = noteAdapter.diff.currentList[position]
                 newList.remove(item)
-                viewModel.updateList(item)
                 noteAdapter.notifyItemRemoved(position)
                 viewModel.deleteNote(item)
 
