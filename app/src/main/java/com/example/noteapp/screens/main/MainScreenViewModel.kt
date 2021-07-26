@@ -58,21 +58,13 @@ class MainScreenViewModel(): ViewModel() {
 
 
 
-   private fun updateNotesList() {
+    private fun updateNotesList() {
         viewModelScope.launch {
-            mList.clear()
             database.getAllNotes().addOnSuccessListener { documents ->
-                documents.forEach {
-                    val id = it["id"].toString()
-                    val title = it["title"].toString()
-                    val description = it["description"].toString()
-                    val imageUri = it["imageUri"].toString()
-                    val imageId = it["imageId"].toString()
-                    val noteTime = it["noteTime"] as Timestamp
-                    mList.add(NoteData(id, title, description, imageUri,imageId,noteTime))
-                }
-                _noteList.value = mList.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
-                _results.value = "Results: ${mList.size}"
+                val notes = documents.toObjects(NoteData::class.java)
+                val sortedList = notes.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
+                _noteList.value = sortedList
+                _results.value = "Results: ${notes.size}"
             }
         }
     }
