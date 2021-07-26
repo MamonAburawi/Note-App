@@ -4,6 +4,7 @@ package com.example.noteapp.screens.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.noteapp.Utils.Constants
 import com.example.noteapp.Utils.Sort
 import com.example.noteapp.database.DataBase
 import com.example.noteapp.model.NoteData
@@ -104,19 +105,20 @@ class MainScreenViewModel(): ViewModel() {
            }
        }
 
-
     fun search(charSequence:String){
-        val filterPattern = charSequence.trim()
-        if (filterPattern.isNotEmpty()){ // filter data
-            val filterList = mList.filter { it.title.contains(filterPattern) } as ArrayList<NoteData>
-            _noteList.value = filterList
-            _results.value = filterList.size.toString()
-        }else{ // all data
-             sort(sort)
-            _results.value = mList.size.toString()
+        viewModelScope.launch {
+            val char = charSequence.trim()
+            val query = Constants.allNotePath
+                .orderBy("title")
+                .startAt(char)
+                .endAt(char +"\uf8ff")
+
+            query.get().addOnSuccessListener {
+                val notes = it.toObjects(NoteData::class.java)
+                _noteList.value = notes
+            }
         }
     }
-
 
 
     override fun onCleared() {
