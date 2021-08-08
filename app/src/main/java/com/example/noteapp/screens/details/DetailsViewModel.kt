@@ -28,18 +28,18 @@ class DetailsViewModel(val data: NoteData) : ViewModel() {
     }
 
 
-    fun loadImage(image: ImageView ,context: Context){
-        _progress.value = true
-        viewModelScope.launch {
-            Constants.filePath(data.imageId).downloadUrl.addOnSuccessListener {
-                Glide.with(context)
-                        .load(it)
-                        .centerCrop()
-                        .into(image)
-                _progress.value = false
-            }
-        }
-    }
+//    fun loadImage(image: ImageView ,context: Context){
+//        _progress.value = true
+//        viewModelScope.launch {
+//            Constants.filePath(data.imageId).downloadUrl.addOnSuccessListener {
+//                Glide.with(context)
+//                        .load(it)
+//                        .centerCrop()
+//                        .into(image)
+//                _progress.value = false
+//            }
+//        }
+//    }
 
 
 

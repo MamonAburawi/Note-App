@@ -1,9 +1,11 @@
 package com.example.noteapp.database
 
 import android.net.Uri
+import android.util.Log
 import com.example.noteapp.Utils.Constants
 import com.example.noteapp.model.NoteData
 import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.FirebaseStorage
 
 
 class DataBase() {
@@ -17,15 +19,18 @@ class DataBase() {
         Constants.allNotePath.document(id).delete()
     }
 
-    suspend fun uploadFile(imageId: String,imageUri: Uri) {
-        Constants.filePath(imageId).putFile(imageUri)
+    suspend fun uploadFile(imageId: String, image: Uri) {
+        FirebaseStorage.getInstance()
+                .reference
+                .child("Photos")
+                .child(imageId)
+                .putFile(image)
+                .addOnSuccessListener {
+                    Log.i("DataBase","Image is uploaded \n image Id: $imageId")
+                }
     }
 
-     fun getFile(imageUri: String): Task<Uri> {
-        return Constants.filePath(imageUri).downloadUrl
-    }
-
-     fun getAllNotes() = Constants.allNotePath.get()
+     fun getAllNotes() = Constants.allNotePath
 
 
 

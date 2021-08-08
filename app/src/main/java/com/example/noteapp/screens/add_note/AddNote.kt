@@ -68,16 +68,15 @@ class AddNote : Fragment() {
     }
 
 
-    private fun addNote(uuid: String ,title: String , description: String ,imageUri: Uri){
+    private fun addNote(uuid: String ,title: String , description: String ,image: Uri){
         if (title.isNotEmpty() && description.isNotEmpty()){
             val noteData = NoteData(
                 uuid,
                 title,
                 description,
-                imageUri.toString(),
                 generateUUID(),
                 getCurrentTime())
-            viewModel.addNote(noteData)
+            viewModel.addNote(noteData, image)
             viewModel.navigationToMainScreen()
             requireActivity().hideKeyboard(binding.ButtonAdd)
             Toast.makeText(activity,"Note is added",Toast.LENGTH_SHORT).show()

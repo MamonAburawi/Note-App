@@ -40,17 +40,17 @@ class DetailScreen : Fragment() {
 
 
         // noteData
-        viewModel.noteData.observe(viewLifecycleOwner, Observer { noteData ->
-            if(noteData != null){
-                if (noteData.imageUri.isNotEmpty()){
-                    viewModel.loadImage(binding.ImageViewNote,requireActivity())
-                }else{
-                    binding.ImageViewNote.setImageResource(R.drawable.ic_no_photography)
-                    binding.imageProgress.visibility = View.GONE
-                    binding.ImageViewNote.visibility = View.VISIBLE
-                }
-            }
-        })
+//        viewModel.noteData.observe(viewLifecycleOwner, Observer { noteData ->
+//            if(noteData != null){
+//                if (noteData.imageId.isNotEmpty()){
+//                    viewModel.loadImage(binding.ImageViewNote,requireActivity())
+//                }else{
+//                    binding.ImageViewNote.setImageResource(R.drawable.ic_no_photography)
+//                    binding.imageProgress.visibility = View.GONE
+//                    binding.ImageViewNote.visibility = View.VISIBLE
+//                }
+//            }
+//        })
 
 
 

@@ -26,8 +26,8 @@ class MainScreen : Fragment() {
 
     private lateinit var binding: MainScreenBinding
     private lateinit var viewModel: MainScreenViewModel
-    private val noteAdapter = NotesAdapter()
-    private lateinit var mList: List<NoteData>
+    private lateinit var noteAdapter: NotesAdapter
+
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -35,8 +35,26 @@ class MainScreen : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.main_screen,container,false)
         viewModel = ViewModelProviders.of(this).get(MainScreenViewModel::class.java)
 
-        binding.viewModel = viewModel
         binding.lifecycleOwner = this
+        noteAdapter = NotesAdapter(requireActivity())
+        binding.viewModel = viewModel
+
+        binding.apply {
+
+            recyclerView.adapter = noteAdapter
+
+            // search edit text
+            EditTextSearch.addTextChangedListener(object :TextWatcher{
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+                override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    viewModel!!.search(charSequence.toString())
+                }
+
+                override fun afterTextChanged(p0: Editable?) {}
+            })
+        }
+
 
 
         swipeToDelete()
@@ -57,27 +75,18 @@ class MainScreen : Fragment() {
             }
         })
 
-        // noteData
-        viewModel.navigateToDetailScreen.observe(viewLifecycleOwner, Observer { noteData->
-            if (noteData != null){
-                findNavController().navigate(MainScreenDirections.actionMainScreenToDetailScreen(noteData))
-                viewModel.navigateToDetailScreenDone()
-            }
-        })
 
         // note list
         viewModel.noteList.observe(viewLifecycleOwner, Observer { noteList ->
-            mList = noteList
-            noteAdapter.diff.submitList(noteList)
-            binding.recyclerView.adapter = noteAdapter
-            noteAdapter.notifyDataSetChanged()
 
-            if (noteList.isEmpty()){
-                binding.recyclerView.visibility = View.GONE
-                binding.TextViewNoData.visibility = View.VISIBLE
-            }else{
+            if (noteList.isNotEmpty()){
+                noteAdapter.diff.submitList(noteList.sortedBy { it.noteTime })
                 binding.recyclerView.visibility = View.VISIBLE
                 binding.TextViewNoData.visibility = View.GONE
+
+            }else{
+                binding.recyclerView.visibility = View.GONE
+                binding.TextViewNoData.visibility = View.VISIBLE
             }
         })
 
@@ -89,24 +98,15 @@ class MainScreen : Fragment() {
 
         // button filter by date
         binding.ButtonSortByDate.setOnClickListener {
-            viewModel.sortData("noteTime")
+//            viewModel.sortData("noteTime")
         }
 
         // button filter by name
         binding.ButtonSortByName.setOnClickListener {
-            viewModel.sortData("title")
+//            viewModel.sortData("title")
         }
 
-        // search edit text
-        binding.EditTextSearch.addTextChangedListener(object :TextWatcher{
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-            override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.search(charSequence.toString())
-            }
-
-            override fun afterTextChanged(p0: Editable?) {}
-        })
 
 
         return binding.root
@@ -127,16 +127,17 @@ class MainScreen : Fragment() {
             ) = true
 
             override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-                val newList = mList.toMutableList()
+//                val newList = mList.toMutableList()
                 val position = viewHolder.adapterPosition
                 val item = noteAdapter.diff.currentList[position]
-                newList.remove(item)
-                noteAdapter.notifyItemRemoved(position)
+//                newList.remove(item)
+//                noteAdapter.notifyItemRemoved(position)
                 viewModel.deleteNote(item)
 
                 Snackbar.make(binding.itemRoot,"Item $position Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("Undo"){
                         // add the note to database
+
                     }
                 }.show()
             }

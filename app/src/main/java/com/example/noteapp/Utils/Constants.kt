@@ -16,9 +16,9 @@ object Constants {
 
     val allNotePath = database.collection("Notes")
 
-    fun filePath(x : String): StorageReference {
-        return FirebaseStorage.getInstance().reference.child("Images/$x")
-    }
+//    fun filePath(x : String): StorageReference {
+//        return FirebaseStorage.getInstance().reference.child("Images/$x")
+//    }
 
 //    val filePath = FirebaseStorage.getInstance().reference.child("Images")
 

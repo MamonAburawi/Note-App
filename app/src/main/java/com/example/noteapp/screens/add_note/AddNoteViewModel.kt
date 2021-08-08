@@ -15,7 +15,7 @@ class AddNoteViewModel(): ViewModel() {
 
     private val database = DataBase()
 
-    private val viewModelScope = CoroutineScope(Dispatchers.Main + Job())
+    private val viewModelScope = CoroutineScope(Dispatchers.IO + Job())
 
     private val _navigationToMainScreen = MutableLiveData<Boolean>()
     val navigationToMainScreen: LiveData<Boolean> = _navigationToMainScreen
@@ -33,20 +33,20 @@ class AddNoteViewModel(): ViewModel() {
         _navigationToMainScreen.value = false
     }
 
-    fun addNote(noteData: NoteData){
+    fun addNote(noteData: NoteData, image: Uri){
         viewModelScope.launch {
             database.addData(noteData)
                 .addOnSuccessListener {  }
                 .addOnFailureListener {
                     Log.e("send",it.message.toString())
                 }
-            uploadFile(noteData.imageId,noteData.imageUri.toUri())
+            uploadFile(noteData.imageId,image)
         }
     }
 
-    private fun uploadFile(imageId:String,imageUri: Uri){
+    private fun uploadFile(imageId:String,image: Uri){
         viewModelScope.launch {
-            database.uploadFile(imageId,imageUri)
+            database.uploadFile(imageId,image)
         }
     }
 

@@ -1,6 +1,8 @@
 package com.example.noteapp.screens.main
 
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +11,9 @@ import com.example.noteapp.Utils.Sort
 import com.example.noteapp.adapter.NotesAdapter
 import com.example.noteapp.database.DataBase
 import com.example.noteapp.model.NoteData
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
@@ -18,9 +22,9 @@ import kotlin.collections.ArrayList
 class MainScreenViewModel(): ViewModel() {
 
     private val database = DataBase()
+    private var query : ListenerRegistration? = null
 
     private val viewModelScope = CoroutineScope(Dispatchers.Main + Job())
-
 
     private val _noteList = MutableLiveData<List<NoteData>>()
     val noteList: LiveData<List<NoteData>> = _noteList
@@ -34,7 +38,6 @@ class MainScreenViewModel(): ViewModel() {
     private val _navigateToDetailScreen  = MutableLiveData<NoteData>()
     val navigateToDetailScreen: LiveData<NoteData> = _navigateToDetailScreen
 
-    private var sort = Sort.Date // by default the sort value will be date
 
 
     init {
@@ -60,13 +63,22 @@ class MainScreenViewModel(): ViewModel() {
 
     private fun updateNotesList() {
         viewModelScope.launch {
-            database.getAllNotes().addOnSuccessListener { documents ->
-                val notes = documents.toObjects(NoteData::class.java)
-                val sortedList = notes.sortedWith(compareBy { it.noteTime.toDate() }).reversed()
-                _noteList.value = sortedList
-                _results.value = "Results: ${notes.size}"
+             query = database.getAllNotes()
+                 .addSnapshotListener { documents, error ->
+                if(error != null){
+                    Log.e("DataBase",error.message.toString())
+                    return@addSnapshotListener
+                }
+                if (documents != null){
+                    val data = documents.toObjects(NoteData::class.java)
+                    _noteList.value = data
+                    _results.value = "Results: ${data.size}"
+                }else{
+                    Log.i("DataBase","No data found!")
+                }
             }
         }
+
     }
 
 
@@ -78,6 +90,22 @@ class MainScreenViewModel(): ViewModel() {
     }
 
 
+//    fun getImages(imageId: String,onComplete:(Uri)-> Unit){
+//        viewModelScope.launch {
+//            FirebaseStorage.getInstance().reference.child("Photos/$imageId")
+//                    .downloadUrl.addOnSuccessListener {
+//                        onComplete(it)
+//                    }
+//        }
+//    }
+
+//    private fun getUserInfo(onComplete:(UserData) -> Unit) {
+//        GlobalScope.launch(Dispatchers.IO){
+//            userInfoPath.get().addOnSuccessListener {
+//                onComplete(it.toObject(UserData::class.java)!!)
+//            }
+//        }
+//    }
 
 
     fun sortData(sort: String) {
@@ -110,7 +138,10 @@ class MainScreenViewModel(): ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+
         viewModelScope.cancel()
+        query!!.remove()
+        Log.i("viewmodel","Main Screen viewModel is cleared..")
     }
 
 

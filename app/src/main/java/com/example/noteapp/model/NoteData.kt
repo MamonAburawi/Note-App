@@ -10,9 +10,8 @@ data class NoteData(
     val id: String,
     val title: String,
     val description: String,
-    val imageUri: String,
     val imageId: String,
     val noteTime: Timestamp
 ):Parcelable{
-    constructor():this("","","","","", Timestamp.now())
+    constructor():this("","","","", Timestamp.now())
 }
