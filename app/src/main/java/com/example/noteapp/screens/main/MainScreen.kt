@@ -132,7 +132,7 @@ class MainScreen : Fragment() {
             ) = true
 
             override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-//                val newList = mList.toMutableList()
+                val noteList = mList!!.toMutableList()
                 val position = viewHolder.adapterPosition
                 val item = noteAdapter.diff.currentList[position]
 //                newList.remove(item)
@@ -140,9 +140,11 @@ class MainScreen : Fragment() {
                 viewModel.deleteNote(item)
 
                 Snackbar.make(binding.itemRoot,"Item $position Deleted",Snackbar.LENGTH_LONG).apply {
+                    duration = 5000
+
                     setAction("Undo"){
                         // add the note to database
-
+                        viewModel.addNote(item)
                     }
                 }.show()
             }

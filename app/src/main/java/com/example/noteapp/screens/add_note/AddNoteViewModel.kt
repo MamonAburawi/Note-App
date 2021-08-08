@@ -36,9 +36,8 @@ class AddNoteViewModel(): ViewModel() {
     fun addNote(noteData: NoteData, image: Uri){
         viewModelScope.launch {
             database.addData(noteData)
-                .addOnSuccessListener {  }
                 .addOnFailureListener {
-                    Log.e("send",it.message.toString())
+                    Log.e("DataBase","error during add note to firebase: ${it.message}")
                 }
             uploadFile(noteData.imageId,image)
         }

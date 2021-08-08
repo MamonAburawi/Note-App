@@ -118,6 +118,16 @@ class MainScreenViewModel(): ViewModel() {
         }
     }
 
+    fun addNote(note: NoteData){
+        viewModelScope.launch {
+            database.addData(note)
+                    .addOnSuccessListener {  }
+                    .addOnFailureListener {
+                        Log.e("DataBase","error during add note to firebase: ${it.message}")
+
+                    }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
