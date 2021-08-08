@@ -27,6 +27,8 @@ class MainScreen : Fragment() {
     private lateinit var binding: MainScreenBinding
     private lateinit var viewModel: MainScreenViewModel
     private lateinit var noteAdapter: NotesAdapter
+    private var mList: List<NoteData>? = null
+
 
 
 
@@ -79,8 +81,11 @@ class MainScreen : Fragment() {
         // note list
         viewModel.noteList.observe(viewLifecycleOwner, Observer { noteList ->
 
+            mList = noteList.sortedBy { it.noteTime }
+
             if (noteList.isNotEmpty()){
-                noteAdapter.diff.submitList(noteList.sortedBy { it.noteTime })
+//                noteAdapter.diff.submitList(mList)
+                initNotesData(mList!!)
                 binding.recyclerView.visibility = View.VISIBLE
                 binding.TextViewNoData.visibility = View.GONE
 
@@ -98,12 +103,12 @@ class MainScreen : Fragment() {
 
         // button filter by date
         binding.ButtonSortByDate.setOnClickListener {
-//            viewModel.sortData("noteTime")
+           initNotesData( mList!!.sortedBy { it.noteTime })
         }
 
         // button filter by name
         binding.ButtonSortByName.setOnClickListener {
-//            viewModel.sortData("title")
+            initNotesData( mList!!.sortedBy { it.title })
         }
 
 
@@ -145,5 +150,9 @@ class MainScreen : Fragment() {
         }).attachToRecyclerView(binding.recyclerView)
     }
 
+
+    private fun initNotesData(list: List<NoteData>){
+        noteAdapter.diff.submitList(list)
+    }
 
 }

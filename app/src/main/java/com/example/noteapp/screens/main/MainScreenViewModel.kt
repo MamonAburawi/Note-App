@@ -90,34 +90,17 @@ class MainScreenViewModel(): ViewModel() {
     }
 
 
-//    fun getImages(imageId: String,onComplete:(Uri)-> Unit){
+    /** sortData() -> this function it every time get the data from firebase **/
+//    fun sortData(sort: String) {
 //        viewModelScope.launch {
-//            FirebaseStorage.getInstance().reference.child("Photos/$imageId")
-//                    .downloadUrl.addOnSuccessListener {
-//                        onComplete(it)
-//                    }
+//            Constants.allNotePath
+//                .orderBy(sort)
+//                .get().addOnSuccessListener {
+//                    val notes = it.toObjects(NoteData::class.java)
+//                    _noteList.value = notes
+//                }
 //        }
 //    }
-
-//    private fun getUserInfo(onComplete:(UserData) -> Unit) {
-//        GlobalScope.launch(Dispatchers.IO){
-//            userInfoPath.get().addOnSuccessListener {
-//                onComplete(it.toObject(UserData::class.java)!!)
-//            }
-//        }
-//    }
-
-
-    fun sortData(sort: String) {
-        viewModelScope.launch {
-            Constants.allNotePath
-                .orderBy(sort)
-                .get().addOnSuccessListener {
-                    val notes = it.toObjects(NoteData::class.java)
-                    _noteList.value = notes
-                }
-        }
-    }
 
 
     fun search(charSequence:String){
